@@ -37,14 +37,14 @@ public class PlayerController : MonoBehaviour
             float accel = acceleration;
             if (_driveDir == -1)
             {
-                max = -reverseSpeed;
-                accel = -reverseAccel;
+                max = reverseSpeed;
+                accel = reverseAccel;
             }
 
             _rb2D.velocity = new Vector2(
                 Mathf.Clamp(_rb2D.velocity.x + accel, -max, max),
                 Mathf.Clamp(_rb2D.velocity.y + accel, -max, max)
-            ) * Time.deltaTime;
+            ) * Time.deltaTime * transform.up * _driveDir;
         }
     }
 
