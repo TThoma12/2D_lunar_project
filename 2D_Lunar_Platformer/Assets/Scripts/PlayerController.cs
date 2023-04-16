@@ -8,16 +8,62 @@ public class PlayerController : MonoBehaviour
     public float acceleration;
     public float reverseAccel;
     public float driveSpeed;
-    public float reverseSpeed;
-    public float turnSpeed = 0.1f;
+    public float turnSpeed = 90;
 
     private Rigidbody2D _rb2D;
     private int _driveDir = 0;
     private int _turnDir = 0;
+    private bool _turningLeft = false;
+    private bool _turningRight = false;
+    private bool _drivingForwards = false;
+    private bool _drivingBackwards = false;
+    private InputMaster _inputMaster;
 
     private void Awake()
     {
         _rb2D = GetComponent<Rigidbody2D>();
+        _inputMaster = new InputMaster();
+
+        _inputMaster.Movement.MoveForwards.performed += (ctx) =>
+        {
+            _drivingForwards = true;
+            _driveDir = 1;
+        };
+        _inputMaster.Movement.MoveForwards.canceled += (ctx) => _drivingForwards = false;
+
+        _inputMaster.Movement.MoveBackwards.performed += (ctx) =>
+        {
+            _drivingBackwards = true;
+            _driveDir = -1;
+        };
+        _inputMaster.Movement.MoveBackwards.canceled += (ctx) => _drivingBackwards = false;
+
+        _inputMaster.Movement.TurnRight.performed += (ctx) =>
+        {
+            _turnDir = 1;
+            _turningRight = true;
+        };
+        _inputMaster.Movement.TurnRight.canceled += (ctx) => _turningRight = false;
+
+        _inputMaster.Movement.TurnLeft.performed += (ctx) =>
+        {
+            _turnDir = 1;
+            _turningLeft = true;
+        };
+        _inputMaster.Movement.TurnLeft.canceled += (ctx) => _turningLeft = false;
+    }
+
+    private void Update()
+    {
+        if (!_turningLeft && !_turningRight)
+        {
+            _turnDir = 0;
+        }
+
+        if (!_drivingBackwards && !_drivingForwards)
+        {
+            _driveDir = 0;
+        }
     }
 
     private void FixedUpdate()
@@ -33,57 +79,26 @@ public class PlayerController : MonoBehaviour
 
         if (_driveDir != 0)
         {
-            float max = driveSpeed;
             float accel = acceleration;
             if (_driveDir == -1)
             {
-                max = reverseSpeed;
                 accel = reverseAccel;
             }
 
             _rb2D.velocity = new Vector2(
-                Mathf.Clamp(_rb2D.velocity.x + accel, -max, max),
-                Mathf.Clamp(_rb2D.velocity.y + accel, -max, max)
+                Mathf.Clamp(_rb2D.velocity.x + accel, -driveSpeed, driveSpeed),
+                Mathf.Clamp(_rb2D.velocity.y + accel, -driveSpeed, driveSpeed)
             ) * Time.deltaTime * transform.up * _driveDir;
         }
     }
 
-    public void TurnLeft(InputAction.CallbackContext context)
+    private void OnEnable()
     {
-        _turnDir = -1;
-
-        if (context.canceled)
-        {
-            _turnDir = 0;
-        }
-    }
-    public void TurnRight(InputAction.CallbackContext context)
-    {
-        _turnDir = 1;
-
-        if (context.canceled)
-        {
-            _turnDir = 0;
-        }
+        _inputMaster.Enable();
     }
 
-    public void MoveForwards(InputAction.CallbackContext context)
-    {
-        _driveDir = 1;
-
-        if (context.canceled)
-        {
-            _driveDir = 0;
-        }
-    }
-    
-    public void MoveBackwards(InputAction.CallbackContext context)
-    {
-        _driveDir = -1;
-
-        if (context.canceled)
-        {
-            _driveDir = 0;
-        }
+    private void OnDisable() 
+    { 
+        _inputMaster.Disable(); 
     }
 }
