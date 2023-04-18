@@ -5,6 +5,9 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
+    public HealthManager health;
+  
+
     public float acceleration;
     public float reverseAccel;
     public float driveSpeed;
@@ -100,5 +103,14 @@ public class PlayerController : MonoBehaviour
     private void OnDisable() 
     { 
         _inputMaster.Disable(); 
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag== "Projectile")
+        {
+            
+            health.TakeDamage(1);
+        }
     }
 }
