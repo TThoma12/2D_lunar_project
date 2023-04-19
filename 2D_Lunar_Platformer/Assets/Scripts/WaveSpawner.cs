@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
+using TMPro;
+
 public class WaveSpawner : MonoBehaviour
 {
 
@@ -11,12 +13,14 @@ public class WaveSpawner : MonoBehaviour
     {
         public string Name;
         public List<Enemy> enemies;
+        public List<PowerUp> powerups;
         public float Rate;
     }
     public Wave[] Waves;
     private int _currentWave = 0;
 
-
+    public Text ScoreText;
+    public int Score =0;
   
     public enum SpawnState { SPAWNING, WAITING, COUNTING };
     private SpawnState _state = SpawnState.COUNTING;
@@ -44,7 +48,7 @@ public class WaveSpawner : MonoBehaviour
                 if (!EnemyIsAlive())
                 {
                     WaveCompleted();
-                  
+                    Score += 1;
                 }
                 else
                 {
@@ -66,7 +70,7 @@ public class WaveSpawner : MonoBehaviour
             _waveCountDown -= Time.deltaTime;
 
         }
-
+        ScoreText.text = "Score : " + Score.ToString();
 
     }
 
@@ -104,7 +108,7 @@ public class WaveSpawner : MonoBehaviour
     IEnumerator SpawnWave(Wave _wave)
     {
 
-        Debug.Log("Spawning wave " + _wave.Name);
+       
         _state = SpawnState.SPAWNING;
      
         // Create Enemy class to instantiate enemies
@@ -112,6 +116,11 @@ public class WaveSpawner : MonoBehaviour
         foreach (Enemy enemy in _wave.enemies)
         {
             SpawnEnemy(enemy);
+            yield return new WaitForSeconds(1f / _wave.Rate);
+        }
+        foreach (PowerUp powerUp in _wave.powerups)
+        {
+            SpawnPowerUp(powerUp);
             yield return new WaitForSeconds(1f / _wave.Rate);
         }
         _state = SpawnState.WAITING;
@@ -125,5 +134,11 @@ public class WaveSpawner : MonoBehaviour
         Transform _sp = SpawnPoints[UnityEngine.Random.Range(0, SpawnPoints.Length)];
         Instantiate(_enemy, _sp.position, _sp.rotation);
        
+    }
+    void SpawnPowerUp(PowerUp _powerup)
+    {
+        Transform _sp = SpawnPoints[UnityEngine.Random.Range(0, SpawnPoints.Length)];
+        Instantiate(_powerup, _sp.position, _sp.rotation);
+
     }
 }

@@ -16,10 +16,10 @@ public class PlayerProjectile : MonoBehaviour
             Destroy(gameObject);
         }
 
-        else
-        {
+        
+           
             Destroy(gameObject);
-        }
-       
+        
+
     }
 }

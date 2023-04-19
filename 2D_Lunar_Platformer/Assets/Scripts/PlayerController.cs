@@ -6,12 +6,17 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     public HealthManager health;
-  
 
-    public float acceleration;
-    public float reverseAccel;
+    private bool SpeedOn=false;
+    public bool DoubleOn = false;
+    public bool ShieldOn = false;
+
+    private float timePowerUp = 10f;
+
+    private float acceleration =250;
+    private float reverseAccel=180;
     public float driveSpeed;
-    public float turnSpeed = 90;
+    private float turnSpeed = 180;
 
     private Rigidbody2D _rb2D;
     private int _driveDir = 0;
@@ -22,11 +27,13 @@ public class PlayerController : MonoBehaviour
     private bool _drivingBackwards = false;
     private InputMaster _inputMaster;
 
+
+    SpriteRenderer sprite;
     private void Awake()
     {
         _rb2D = GetComponent<Rigidbody2D>();
         _inputMaster = new InputMaster();
-
+        sprite = GetComponent<SpriteRenderer>();
         _inputMaster.Movement.MoveForwards.performed += (ctx) =>
         {
             _drivingForwards = true;
@@ -50,7 +57,7 @@ public class PlayerController : MonoBehaviour
 
         _inputMaster.Movement.TurnLeft.performed += (ctx) =>
         {
-            _turnDir = 1;
+            _turnDir = -1;
             _turningLeft = true;
         };
         _inputMaster.Movement.TurnLeft.canceled += (ctx) => _turningLeft = false;
@@ -67,6 +74,30 @@ public class PlayerController : MonoBehaviour
         {
             _driveDir = 0;
         }
+
+        if (SpeedOn == true && timePowerUp >0)
+        {
+            acceleration = 450f;
+            timePowerUp -= Time.deltaTime;
+        }
+        if (ShieldOn == true && timePowerUp > 0)
+        {
+            sprite.color = Color.blue;
+            timePowerUp -= Time.deltaTime;
+        }
+
+
+        if (timePowerUp<=0)
+        {
+            acceleration = 250;
+            SpeedOn = false;
+            DoubleOn = false;
+            ShieldOn = false;
+            sprite.color = Color.white;
+        }
+
+
+
     }
 
     private void FixedUpdate()
@@ -109,8 +140,36 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.tag== "Projectile")
         {
+            if (ShieldOn)
+            {
+                return;
+            }
+            else
+            {
+                health.TakeDamage(1);
+            }
             
-            health.TakeDamage(1);
+        }
+        if (collision.gameObject.tag == "Speed")
+        {
+            
+            timePowerUp = 10f;
+            Destroy(collision.gameObject);
+            SpeedOn = true;
+        }
+        if (collision.gameObject.tag == "Double")
+        {
+
+            timePowerUp = 10f;
+            Destroy(collision.gameObject);
+            DoubleOn = true;
+        }
+        if (collision.gameObject.tag == "Shield")
+        {
+
+            timePowerUp = 10f;
+            Destroy(collision.gameObject);
+            ShieldOn = true;
         }
     }
 }

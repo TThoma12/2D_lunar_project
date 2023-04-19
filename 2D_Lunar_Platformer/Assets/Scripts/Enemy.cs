@@ -2,13 +2,13 @@
 using System;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
+
 public class Enemy : MonoBehaviour
 {
     private float Health=2;
     public float Speed;
     public int damage;
-
-
     private float timerToShoot;
 
     public Transform bulletPosition;
@@ -38,7 +38,7 @@ public class Enemy : MonoBehaviour
             EnemyShoot();
             Invoke("UnTrigger", 0.3f);
         }
-
+       
     }
 
     private void EnemyShoot()

@@ -8,7 +8,8 @@ public class HealthManager : MonoBehaviour
 
     public int Health = 6;
     public Image[] hearts;
-   
+
+    public GameObject gameOverScreen;
     // Update is called once per frame
     void Update()
     {
@@ -19,6 +20,12 @@ public class HealthManager : MonoBehaviour
         for (int i = 0; i < Health; i++)
         {
             hearts[i].gameObject.SetActive(true);
+        }
+        if (Health == 0)
+        {
+            gameOverScreen.SetActive(true);
+            
+
         }
     }
     

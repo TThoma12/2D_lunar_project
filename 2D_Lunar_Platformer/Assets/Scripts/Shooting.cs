@@ -7,23 +7,25 @@ public class Shooting : MonoBehaviour
 {
     public Transform firePoint;
     public GameObject bulletPrefab;
-    public float shootSpeed;
-    public float BulletSpeed;
+    private float shootSpeed=0.5f;
+    private float BulletSpeed=0.03f;
     private bool canShoot = true;
-
-
-
-    void Start()
-    {
-
-    }
-
+    public PlayerController player;
     // Update is called once per frame
     void Update()
     {
         if (Input.GetButtonDown("Fire1") && canShoot)
         {
             StartCoroutine(ShootGun());
+        }
+
+        if (player.DoubleOn == true)
+        {
+            shootSpeed = 0.2f;
+        }
+        else
+        {
+            shootSpeed = 0.5f;
         }
     }
 
